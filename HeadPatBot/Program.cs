@@ -15,7 +15,6 @@ namespace HeadPatBot
         private DiscordSocketClient _client;
         private CommandService _commands;
         private IServiceProvider _services;
-        private bool loginsuccess = false;
 
         public async Task RunBotAsync()
         {
@@ -27,30 +26,14 @@ namespace HeadPatBot
                 .AddSingleton(_commands)
                 .BuildServiceProvider();
 
-            Console.Write("Please enter your token: ");
-            string botToken = Console.ReadLine();
+            string botToken = Environment.GetEnvironmentVariable("token");
 
             // event subscriptions
             _client.Log += Log;
 
             await RegisterCommandAsync();
 
-            while (!loginsuccess)
-            {
-                try
-                {
-                    await _client.LoginAsync(TokenType.Bot, botToken);
-                    loginsuccess = true;
-                }
-                catch
-                {
-                    Console.Clear();
-                    Console.WriteLine("!!!Invalid token!!!");
-                    Console.Write("Please enter your token: ");
-                    botToken = Console.ReadLine();
-                    loginsuccess = false;
-                }
-            }
+            await _client.LoginAsync(TokenType.Bot, botToken);
 
             await _client.StartAsync();
 
